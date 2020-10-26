@@ -1,0 +1,113 @@
+$color: #2c3e50;
+/* global */
+$base-color: #1b6aae;
+$base-color-light: #409eff;
+// $font-lg: 26px;
+$font-lg:21px;
+$font-md: 18px;
+$font-sm: 16px;
+$font-ss:14px;
+$font-xs: 12px;
+$font-light: #fff;
+$font-gray: #9d9d9d;
+$border-gray: #f9f9f9;
+$box-shadow-color: #E4E7ED;
+$img-xl: 88px;
+$img-lg: 50px;
+$img-md: 44px;
+$img-sd: 28px;
+$img-sm: 24px;
+
+.lighter {
+  font-weight: lighter;
+}
+
+@mixin font-lg {
+  font-size: $font-lg
+}
+
+@mixin square($size) {
+  width: $size;
+  height: $size;
+}
+
+/* panel */
+$panel-bg: rgba(255, 255, 255, 0.7);
+/* header */
+$height-header: 70px;
+$menu-gap: 10px;
+$header-bg: #1589ce;
+$header-bg-dark: rgb(11, 126, 215);
+$user-bg: #30313345;
+
+/* sidebar */
+$sidebar-width: 180px;
+$sidebar-gap: 30px;
+$sidebar-bg: #002E4A;
+$sidebar-font-active-color: #005081;
+$catalog-width:360px;
+
+/* toolbar */
+$toolbar-height: 40px;
+$toolbar-gap_project: 10px;
+$toolbar-gap_tool: 40px;
+
+/* mine panel */
+$mine-panel-width: 400px;
+$mine-panel-bg: rgb(244, 244, 244);
+
+/* environment-panel-width */
+$environment-panel-width: 400px;
+
+/*筛选颜色设置*/
+$select-bg-color: #f3f6fa;
+$select-border-color: #e2eaf5;
+$select-active-bg-color: #fff;
+$select-placeholder-color: #676869;
+$select-active-placeholder-color: #1489ce;
+
+/*IE滚动条颜色设置*/
+* {
+  scrollbar-arrow-color: #f2f2f3;
+  /*上下箭头*/
+  scrollbar-track-color: #1589ce;
+  /*底层背景色*/
+  scrollbar-face-color: #27aeff;
+  /*滚动条前景色*/
+  scrollbar-shadow-color: #1589ce;
+  /*滚动条边线色*/
+}
+
+/*chrome滚动条颜色设置*/
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+  background-color: transparent;
+}
+
+/*定义滚动条高宽及背景 高宽分别对应横竖滚动条的尺寸*/
+*::-webkit-scrollbar-track {
+  background-color: #F1F1F1;
+  border-radius: 10px;
+}
+
+/*定义滚动条轨道 内阴影+圆角*/
+*::-webkit-scrollbar-thumb {
+  background-color: #C1C1C1;
+  border-radius: 10px;
+}
+
+/* 动画 */
+.left-enter-active {
+  animation: bounce-in 0.3s reverse;
+}
+
+.left-leave-active {
+  animation: bounce-in 0.3s;
+}
+
+@keyframes bounce-in {
+  100% {
+    transform: translateX(-$environment-panel-width);
+  }
+}
