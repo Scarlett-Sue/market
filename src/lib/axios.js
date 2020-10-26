@@ -97,7 +97,7 @@ const printData = response => {
 
 const errHandle = response => {
   Vue.prototype.$message({
-    message: R.path(['meta', 'message'], response),
+    message: R.path(['message'], response),
     type: 'warning',
   });
 };
@@ -105,7 +105,7 @@ const errHandle = response => {
 api.interceptors.request.use(
   option => {
     if (sessionStorage.getItem('token')) {
-      option.headers['X-Token'] = sessionStorage.getItem('token');
+      option.headers['token'] = sessionStorage.getItem('token');
     }
     return option;
   },
@@ -117,27 +117,16 @@ api.interceptors.request.use(
 );
 api.interceptors.response.use(
   response => {
-    //   if (response.data.err) {
-    //     printError(response)
-    //     return Promise.reject(response.data)
-    //   } else {
-    //     if (response.data.page) {
-    //       printList(response)
-    //       return Promise.resolve(response.data)
-    //     } else {
-    //       printData(response)
-    //       return Promise.resolve(response.data.data)
-    //     }
-    //   }
     if (
       response.data &&
-      response.data.meta &&
-      response.data.meta.code === 401
+      response.data.code &&
+      response.data.code === '10120'
     ) {
       window.sessionStorage.clear();
       window.location.reload();
     }
-    if (response.data && response.data.meta && !response.data.meta.success) {
+    if (response.data &&
+      response.data.code !== '20000') {
       errHandle(response.data);
       return Promise.reject(response.data);
     } else {

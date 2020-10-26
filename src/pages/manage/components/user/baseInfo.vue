@@ -88,7 +88,7 @@ export default {
     }),
     requestHeader: () => {
       if (sessionStorage.getItem('token')) {
-        return { 'X-Token': sessionStorage.getItem('token') };
+        return { 'token': sessionStorage.getItem('token') };
       }
     },
   },

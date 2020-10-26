@@ -21,8 +21,8 @@
             <el-form-item prop="username">
               <el-input
                 type="text"
-                placeholder="账号"
-                v-model="loginForm.username"
+                placeholder="电话"
+                v-model="loginForm.telephone"
               ></el-input>
             </el-form-item>
             <el-form-item prop="password">
@@ -54,14 +54,14 @@ export default {
       loginbg,
       isSaveUserInfo: false,
       loginForm: {
-        username: '',
+        telephone: '',
         password: '',
       },
       isRemenber: false,
       rules: {
-        username: {
+        telephone: {
           required: true,
-          message: '用户名不能为空',
+          message: '电话不能为空',
           trigger: 'blur',
         },
         password: { required: true, message: '密码不能为空', trigger: 'blur' },
@@ -75,13 +75,15 @@ export default {
       this.$refs[formName].validate(valid => {
         if (valid) {
           this.LOGIN({
-            userName: this.loginForm.username,
+            telephone: this.loginForm.telephone,
             password: this.loginForm.password,
           }).then(response => {
             if (response instanceof Error) {
               this.$message({ message: response, type: 'error' });
             } else {
-              this.$router.push('/myself')
+              this.$router.push({
+                name: 'myself'
+              });
             }
           });
         } else {

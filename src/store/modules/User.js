@@ -1,5 +1,4 @@
 import common from '@/api/common';
-import mineOwnerLogin from '@/api/common';
 import * as R from 'ramda';
 import { webConfig } from '@/config';
 
@@ -10,16 +9,7 @@ const state = {
 
 const getters = {
   userType(state) {
-    return R.path(['userInfo', 'referenceInfo', 'dept', 'type'], state);
-  },
-  // 判断是否是区县经办
-  submitPermission(state, getters) {
-    if (getters.userStation) {
-      return (
-        R.find(R.propEq('fkStation', '04'), getters.userStation) &&
-        getters.xzqhNo != '500000'
-      );
-    }
+    return R.path(['userInfo', 'type'], state);
   },
 };
 
@@ -50,12 +40,8 @@ const actions = {
     if (response instanceof Error || !response) {
     } else {
       const { data } = response;
-      let userType = R.path(
-        ['userInfo', 'referenceInfo', 'dept', 'type'],
-        state,
-      );
-      commit('SET_USER_TOKEN', data.referenceInfo.token);
-      commit('SET_USER_INFO', data);
+      commit('SET_USER_TOKEN', data.token);
+      commit('SET_USER_INFO', data.user);
     }
     return response;
   },
@@ -65,7 +51,7 @@ const actions = {
     window.location.reload();
   },
   FAKE_LOGIN({ dispatch }, userInfo) {
-    return dispatch('LOGIN', { userName: '', password: '' });
+    return dispatch('LOGIN', { userName: 'yanxiao', password: 123456 });
   },
 };
 

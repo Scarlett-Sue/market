@@ -22,6 +22,7 @@ export default [
         path: 'myself',
         name: 'myself',
         component: () => import('../views/myself/index'),
+        redirect: 'myself/save',
         children: [
           {
             path: 'save',

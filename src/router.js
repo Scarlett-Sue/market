@@ -61,10 +61,10 @@ export default (store, routes = [], options = {}) => {
 
     // 进入下一个路由
     if (auth) {
-      // if (!isLogin && path !== '/login') {
-      //   next({ path: 'login' });
-      // }
-      // if (isLogin && path === '/login') return next({ path: '/' });
+      if (!isLogin && path !== '/login') {
+        next({ path: 'login' });
+      }
+      if (isLogin && path === '/login') return next({ path: '/' });
       next();
     } else {
       next();

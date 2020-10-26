@@ -10,19 +10,8 @@ export default {
     return $http.fetch({
       method: 'post',
       url: url.login,
-      data: qs.stringify(user),
+      data: user,
     });
-  },
-  async mineOwnerLogin(params) {
-    const md5 = crypto.createHash('md5');
-    md5.update(params.password);
-    params.password = md5.digest('hex');
-    let res = await $http.fetch({
-      method: 'post',
-      url: url.mineOwnerLogin,
-      data: qs.stringify(params),
-    });
-    return res;
   },
   alterPass({ oldPassword, newPassword }) {
     const md5 = crypto.createHash('md5');

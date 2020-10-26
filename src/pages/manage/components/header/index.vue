@@ -5,12 +5,9 @@
       <el-dropdown @command="handleDropMenu">
         <div class="user">
           <i class="el-icon-s-custom"></i>
-          <span>小廖</span>
+          <span>{{userInfo.name}}</span>
         </div>
         <el-dropdown-menu slot="dropdown">
-          <!-- <el-dropdown-item command="个人中心"
-            ><i class="iconfont el-icon-user"></i>个人中心
-          </el-dropdown-item> -->
           <el-dropdown-item command="退出登录"
             ><i class="iconfont el-icon-switch-button"></i
             >退出登录</el-dropdown-item
@@ -34,23 +31,12 @@ export default {
   },
   computed: {
     ...mapState('User', {
-      userInfo: state => {
-        const { userInfo } = state;
-        if (!userInfo) {
-          return {};
-        }
-        return userInfo;
-      },
+      userInfo: state => state.userInfo,
     }),
-    ...mapGetters('User', ['userType']),
   },
   methods: {
     handleDropMenu(item) {
-      // if (item === '个人中心') {
-      //   window.location.href = webConfig.path + '/personal.html#/';
-      // } else {
-        this.LOGINOUT();
-      // }
+      this.LOGINOUT();
     },
     goHome() {
     },
