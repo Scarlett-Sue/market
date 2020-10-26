@@ -1,56 +1,25 @@
 <template>
   <div class="list-wrapper">
-    <!-- <div class="middle">
-      <el-button
-        type="primary"
-        @click="gotoSave"
-        icon="el-icon-plus"
-        size="small"
-        style="margin-right: 15px"
-      >新增</el-button>
-      <el-input
-        placeholder="输入名称进行查询"
-        v-model="ksmc"
-        style="float: right; width: 350px;"
-        size="small"
-        suffix-icon="el-icon-search"
-        @input="clickTab(1)"
-      ></el-input>
-    </div> -->
     <div class="bottom">
       <div class="choose">
       </div>
       <div class="content" v-loading="loading">
         <el-table :data="todoData" style="width: 100%">
-          <el-table-column prop="userId" label="人员id"></el-table-column>
+          <el-table-column prop="id" label="人员id"></el-table-column>
           <el-table-column prop="userName" label="人员名称"></el-table-column>
           <el-table-column prop="userType" label="人员身份"></el-table-column>
-          <el-table-column prop="time" label="登陆时间"></el-table-column>
-          <!-- <el-table-column fixed="right" label="操作" :width="isHasDetele ? 100 : 80">
+          <el-table-column prop="createTime" label="登陆时间">
             <template slot-scope="scope">
-              <el-button
-                type="text"
-                style="font-size: 14px; font-weight: normal;"
-                @click.native.prevent="deal(scope, 'view')"
-                size="small"
-                class="my-button"
-              >编辑</el-button>
-              <el-button
-                type="text"
-                style="font-size: 14px; font-weight: normal; color: #f56c6c"
-                @click.native.prevent="deal(scope, 'delete')"
-                size="small"
-                class="my-button"
-              >删除</el-button>
+              {{scope.row.createTime | formatDate }}
             </template>
-          </el-table-column> -->
+          </el-table-column>
         </el-table>
         <div class="my-page">
           <el-pagination
             background
             :pager-count="5"
             @current-change="clickTab"
-            :current-page.sync="pageIndex"
+            :current-page.sync="pageNo"
             :page-size="pageSize"
             layout="prev, pager, next"
             :total="totalCount"
@@ -70,17 +39,8 @@ export default {
   data() {
     return {
       pageSize: 10,
-      pageIndex: 1,
+      pageNo: 1,
       totalCount: null,
-      searchTable: {
-        kslb: '',
-        kcfs: '',
-        kz: '',
-        gbnd: '',
-        tdqs: '',
-        xzqh: '',
-        state: '',
-      },
       todoData: [],
       loading: false,
     };
@@ -94,37 +54,34 @@ export default {
     this.clickTab();
   },
   methods: {
-    async clickTab(pageIndex) {
+    async clickTab(pageNo) {
       this.loading = true;
       let param = {
-        pageIndex: pageIndex || this.pageIndex,
+        pageNo: pageNo || this.pageNo,
         pageSize: this.pageSize,
-        keyword: this.ksmc || undefined,
       };
-      // let res = await manage.getGoodsList(param);
-      // this.totalCount = res.totalCount;
-      // const dataList = res.dataList || [];
+      let res = await manage.logList(param);
+      this.totalCount = res.total;
+      this.todoData = res.list || [];
       this.loading = false;
     },
-    gotoSave() {
-      this.$router.push({
-        name: 'userSave',
-      });
-    },
-    async deleteSelf(id) {
-      let res = await manage.goodsRemove({id: id});
-      if (res.meta.code === 200) {
-        this.clickTab();
-        this.$message({
-          type: 'success',
-          message: '删除成功!',
-        });
-      } else {
-        this.$message({
-          type: 'error',
-          message: '删除失败!',
-        });
+  },
+  filters: {
+    formatDate(date) {
+      if (!date) {
+        return '';
       }
+      date = new Date(date);
+      const addZero = val => {
+        return val >= 10 ? val : `0${val}`;
+      };
+      const year = date.getFullYear();
+      const month = addZero(date.getMonth() + 1);
+      const day = addZero(date.getDate());
+      const hour = addZero(date.getHours());
+      const minute = addZero(date.getMinutes());
+      const second = addZero(date.getSeconds());
+      return `${year}-${month}-${day} ${hour}:${minute}:${second}`;
     },
   },
 };

@@ -17,17 +17,20 @@ export default [
         path: 'develop',
         name: 'develop',
         component: () => import('@/components/develop/develop'),
+        props: route => ({ ...route.query }),
       },
       {
         path: 'myself',
         name: 'myself',
         component: () => import('../views/myself/index'),
+        props: route => ({ ...route.query }),
         redirect: 'myself/save',
         children: [
           {
             path: 'save',
             name: 'myselfSave',
             component: () => import('../views/myself/save'),
+            props: route => ({ ...route.query }),
           },
         ],
       },
@@ -35,11 +38,13 @@ export default [
         path: 'depot',
         name: 'depot',
         component: () => import('../views/depot/index'),
+        props: route => ({ ...route.query }),
         children: [
           {
             path: 'save',
             name: 'depotSave',
             component: () => import('../views/depot/save'),
+            props: route => ({ ...route.query }),
           },
         ],
       },
@@ -47,11 +52,13 @@ export default [
         path: 'supplier',
         name: 'supplier',
         component: () => import('../views/supplier/index'),
+        props: route => ({ ...route.query }),
         children: [
           {
             path: 'save',
             name: 'supplierSave',
             component: () => import('../views/supplier/save'),
+            props: route => ({ ...route.query }),
           },
         ],
       },
@@ -59,11 +66,13 @@ export default [
         path: 'dealer',
         name: 'dealer',
         component: () => import('../views/dealer/index'),
+        props: route => ({ ...route.query }),
         children: [
           {
             path: 'save',
             name: 'dealerSave',
             component: () => import('../views/dealer/save'),
+            props: route => ({ ...route.query }),
           },
         ],
       },
@@ -71,11 +80,13 @@ export default [
         path: 'goods',
         name: 'goods',
         component: () => import('../views/goods/index'),
+        props: route => ({ ...route.query }),
         children: [
           {
             path: 'save',
             name: 'goodsSave',
             component: () => import('../views/goods/save'),
+            props: route => ({ ...route.query }),
           },
         ],
       },
@@ -83,11 +94,13 @@ export default [
         path: 'purchase',
         name: 'purchase',
         component: () => import('../views/purchase/index'),
+        props: route => ({ ...route.query }),
         children: [
           {
             path: 'save',
             name: 'purchaseSave',
             component: () => import('../views/purchase/save'),
+            props: route => ({ ...route.query }),
           },
         ],
       },
@@ -95,11 +108,13 @@ export default [
         path: 'shipment',
         name: 'shipment',
         component: () => import('../views/shipment/index'),
+        props: route => ({ ...route.query }),
         children: [
           {
             path: 'save',
             name: 'shipmentSave',
             component: () => import('../views/shipment/save'),
+            props: route => ({ ...route.query }),
           },
         ],
       },
@@ -107,11 +122,13 @@ export default [
         path: 'user',
         name: 'user',
         component: () => import('../views/user/index'),
+        props: route => ({ ...route.query }),
         children: [
           {
             path: 'save',
             name: 'userSave',
             component: () => import('../views/user/save'),
+            props: route => ({ ...route.query }),
           },
         ],
       },
@@ -119,6 +136,7 @@ export default [
         path: 'log',
         name: 'log',
         component: () => import('../views/log/index'),
+        props: route => ({ ...route.query }),
         children: [
         ],
       },

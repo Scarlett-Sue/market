@@ -1,5 +1,5 @@
 <template>
-  <div class="list-wrapper">
+  <div class="user-wrapper">
     <div class="middle">
       <el-button
         type="primary"
@@ -7,10 +7,10 @@
         icon="el-icon-plus"
         size="small"
         style="margin-right: 15px"
-      >新增</el-button>
+      >添加</el-button>
       <el-input
         placeholder="输入名称进行查询"
-        v-model="ksmc"
+        v-model="name"
         style="float: right; width: 350px;"
         size="small"
         suffix-icon="el-icon-search"
@@ -18,28 +18,31 @@
       ></el-input>
     </div>
     <div class="bottom">
-      <div class="choose">
-      </div>
       <div class="content" v-loading="loading">
         <el-table :data="todoData" style="width: 100%">
-          <el-table-column prop="name" label="名称"></el-table-column>
+          <el-table-column prop="name" label="员工名称"></el-table-column>
           <el-table-column prop="sex" label="性别"></el-table-column>
           <el-table-column prop="telephone" label="电话"></el-table-column>
-          <el-table-column prop="card" label="身份证号"></el-table-column>
-          <el-table-column prop="type" label="类型"></el-table-column>
-          <el-table-column fixed="right" label="操作" :width="isHasDetele ? 100 : 80">
+          <el-table-column prop="card" label="身份证"></el-table-column>
+          <el-table-column prop="type" label="类型">
+            <template slot-scope="scope">
+              {{ typeList[scope.row.type]}}
+            </template>
+          </el-table-column>
+          <el-table-column fixed="right" label="操作" width="100">
             <template slot-scope="scope">
               <el-button
                 type="text"
                 style="font-size: 14px; font-weight: normal;"
-                @click.native.prevent="deal(scope, 'view')"
+                @click.native.prevent="gotoEdit(scope.row)"
                 size="small"
                 class="my-button"
               >编辑</el-button>
               <el-button
+                v-if="userInfo.type === '1'"
                 type="text"
                 style="font-size: 14px; font-weight: normal; color: #f56c6c"
-                @click.native.prevent="deal(scope, 'delete')"
+                @click.native.prevent="gotoDelete(scope.row)"
                 size="small"
                 class="my-button"
               >删除</el-button>
@@ -51,7 +54,7 @@
             background
             :pager-count="5"
             @current-change="clickTab"
-            :current-page.sync="pageIndex"
+            :current-page.sync="pageNo"
             :page-size="pageSize"
             layout="prev, pager, next"
             :total="totalCount"
@@ -70,20 +73,18 @@ export default {
   props: {},
   data() {
     return {
+      name: '',
       pageSize: 10,
-      pageIndex: 1,
+      pageNo: 1,
       totalCount: null,
-      searchTable: {
-        kslb: '',
-        kcfs: '',
-        kz: '',
-        gbnd: '',
-        tdqs: '',
-        xzqh: '',
-        state: '',
-      },
       todoData: [],
       loading: false,
+      typeList: {
+        1: '超级管理员',
+        2: '仓库管理员',
+        3: '采购员',
+        4: '出货员',
+      }
     };
   },
   computed: {
@@ -95,16 +96,16 @@ export default {
     this.clickTab();
   },
   methods: {
-    async clickTab(pageIndex) {
+    async clickTab(pageNo) {
       this.loading = true;
       let param = {
-        pageIndex: pageIndex || this.pageIndex,
+        pageNo: pageNo || this.pageNo,
         pageSize: this.pageSize,
-        keyword: this.ksmc || undefined,
+        name: this.name || undefined,
       };
-      // let res = await manage.getGoodsList(param);
-      // this.totalCount = res.totalCount;
-      // const dataList = res.dataList || [];
+      let res = await manage.userList(param);
+      this.totalCount = res.total;
+      this.todoData = res.list || [];
       this.loading = false;
     },
     gotoSave() {
@@ -112,9 +113,33 @@ export default {
         name: 'userSave',
       });
     },
-    async deleteSelf(id) {
-      let res = await manage.goodsRemove({id: id});
-      if (res.meta.code === 200) {
+    gotoEdit(item) {
+      this.$router.push({
+        name: 'userSave',
+        query: {
+          id: item.id
+        }
+      });
+    },
+    gotoDelete(item) {
+      this.$confirm('是否确定删除?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+      })
+        .then(() => {
+          this.deleteSelf(item);
+        })
+        .catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除',
+          });
+        });
+    },
+    async deleteSelf(item) {
+      let res = await manage.userRemove({id: item.id});
+      if (res.code === '20000' && res.data === 1) {
         this.clickTab();
         this.$message({
           type: 'success',
@@ -131,7 +156,7 @@ export default {
 };
 </script>
 <style lang="scss">
-.list-wrapper {
+.user-wrapper {
   padding: 15px 20px;
   .el-button--mini,
   .el-button--small {
@@ -142,15 +167,15 @@ export default {
     background-color: #545c64;
     border: none;
   }
-  .el-radio-button__orig-radio:checked + .el-radio-button__inner {
-    background-color: #545c64;
-    border-color: #545c64;
-    color: #fff;
-  }
-  .el-radio-button__inner:hover,
-  .el-button--text {
-    color: #545c64;
-  }
+  // .el-radio-button__orig-radio:checked + .el-radio-button__inner {
+  //   background-color: #545c64;
+  //   border-color: #545c64;
+  //   color: #fff;
+  // }
+  // .el-radio-button__inner:hover,
+  // .el-button--text {
+  //   color: #545c64;
+  // }
   .el-radio-button--small .el-radio-button__inner {
     font-size: 14px;
     font-weight: normal;

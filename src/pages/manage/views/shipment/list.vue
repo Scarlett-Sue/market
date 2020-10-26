@@ -53,7 +53,7 @@
             background
             :pager-count="5"
             @current-change="clickTab"
-            :current-page.sync="pageIndex"
+            :current-page.sync="pageNo"
             :page-size="pageSize"
             layout="prev, pager, next"
             :total="totalCount"
@@ -73,7 +73,7 @@ export default {
   data() {
     return {
       pageSize: 10,
-      pageIndex: 1,
+      pageNo: 1,
       totalCount: null,
       searchTable: {
         kslb: '',
@@ -97,10 +97,10 @@ export default {
     this.clickTab();
   },
   methods: {
-    async clickTab(pageIndex) {
+    async clickTab(pageNo) {
       this.loading = true;
       let param = {
-        pageIndex: pageIndex || this.pageIndex,
+        pageNo: pageNo || this.pageNo,
         pageSize: this.pageSize,
         keyword: this.ksmc || undefined,
       };

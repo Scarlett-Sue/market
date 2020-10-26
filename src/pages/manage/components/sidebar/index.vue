@@ -9,7 +9,8 @@
           <svg-icon :iconClass="group.icon"></svg-icon>
           {{ group.name }}
         </template>
-        <el-menu-item v-for="menuItem in group.children" :key="menuItem.key" :index="menuItem.name" @click="handleMenuSelect(menuItem)">
+        <el-menu-item v-for="menuItem in group.children" :key="menuItem.key" :index="menuItem.name" @click="handleMenuSelect(menuItem)"
+        v-if="menuItem.exclude.includes(userInfo.type)">
           <svg-icon :iconClass="menuItem.icon"></svg-icon>
           <span slot="title">
             {{ menuItem.name }}
@@ -21,6 +22,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 export default {
   methods: {
     handleMenuSelect(item) {
@@ -33,6 +35,9 @@ export default {
     };
   },
   computed: {
+    ...mapState('User', {
+      userInfo: state => state.userInfo,
+    }),
     userType() {
       return this.$store.getters['User/userType'];
     },

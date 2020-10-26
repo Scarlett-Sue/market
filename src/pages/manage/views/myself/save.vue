@@ -20,8 +20,7 @@
 </template>
 <script>
 import { mapState, mapGetters } from 'vuex';
-// import approval from '@/api/approval';
-// import mineOwner from '@/api/mine_owner';
+import manage from '@/api/manage';
 import baseInfo from '../../components/myself/baseInfo';
 
 export default {
@@ -35,64 +34,33 @@ export default {
   },
   data() {
     return {
+      btnLoading: false,
+      detail: {},
     };
   },
   computed: {
     ...mapState('User', {
-      userInfo: state => {
-        const { userInfo } = state;
-        if (!userInfo) {
-          return {};
-        }
-        return userInfo;
-      },
+      userInfo: state => state.userInfo,
     }),
-    ...mapGetters('User', ['userType']),
   },
   async mounted() {
     const load = this.$loading({ background: 'rgba(255,255,255,0.5)' });
-    if (this.id) {
-      let detail = await mineOwner.getFundBaseInfoDetail({ mfId: this.id });
-      this.detail = detail;
-    }
+    let detail = await manage.userDetail({ id: this.userInfo.id });
+    this.detail = detail;
     load.close();
   },
   methods: {
     async submit(operate) {
-        await this.validateForm('baseInfo');
-
+      await this.validateForm('baseInfo');
       let infoForm = Object.assign({}, this.$refs.baseInfo.form);
-      if (
-        !this.transFileList(mineFundFileInfos, this.$refs.baseInfo.fj, operate)
-      ) {
-        return false;
-      }
-      infoForm.mineFundFileInfos = mineFundFileInfos;
-
       this.btnLoading = true;
       try {
-        infoForm.mineFlag = 1;
-        let res = await mineOwner.launchFundBaseInfo(infoForm);
+        let res = await manage.userUpdate(infoForm);
         this.btnLoading = false;
-        if (this.$R.path(['meta', 'success'], res)) {
-          this.$message({
-            message: '提交基金基本信息成功',
-            type: 'success',
-          });
-          this.$router.push({
-            name: 'fundBaseInfo',
-          });
+        if (res.code === '20000') {
+          this.$message.success('保存成功');
         } else {
-          infoForm.mineFlag = 0;
-          let res = await mineOwner.launchFundBaseInfo(infoForm);
-          this.btnLoading = false;
-          if (this.$R.path(['meta', 'success'], res)) {
-            this.mfId = res.data;
-            this.$message({
-              message: '保存基金基本信息成功',
-              type: 'success',
-            });
-          }
+          this.$message.warning(res.data || '保存失败');
         }
       } catch (error) {
         this.btnLoading = false;
