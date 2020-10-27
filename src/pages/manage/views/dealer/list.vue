@@ -1,5 +1,5 @@
 <template>
-  <div class="list-wrapper">
+  <div class="dealer-wrapper">
     <div class="middle">
       <el-button
         type="primary"
@@ -7,10 +7,10 @@
         icon="el-icon-plus"
         size="small"
         style="margin-right: 15px"
-      >新增</el-button>
+      >添加</el-button>
       <el-input
         placeholder="输入名称进行查询"
-        v-model="ksmc"
+        v-model="name"
         style="float: right; width: 350px;"
         size="small"
         suffix-icon="el-icon-search"
@@ -18,34 +18,27 @@
       ></el-input>
     </div>
     <div class="bottom">
-      <div class="choose">
-      </div>
       <div class="content" v-loading="loading">
         <el-table :data="todoData" style="width: 100%">
-          <el-table-column prop="xzqh" label="经销商名称"></el-table-column>
-          <el-table-column prop="ksmc" label="联系人"></el-table-column>
-          <el-table-column prop="gbnd" label="类型电话"></el-table-column>
-          <el-table-column prop="kslb" label="银行卡号"></el-table-column>
-          <el-table-column prop="kz" label="地址"></el-table-column>
-          <!-- <el-table-column label="状态" width="140">
-            <template slot-scope="scope">
-              <el-tag :class="addClass(scope)">{{ getState(scope) }}</el-tag>
-            </template>
-          </el-table-column> -->
-          <el-table-column fixed="right" label="操作" :width="isHasDetele ? 100 : 80">
+          <el-table-column prop="name" label="供货商名称"></el-table-column>
+          <el-table-column prop="address" label="地址"></el-table-column>
+          <el-table-column prop="person" label="联系人"></el-table-column>
+          <el-table-column prop="telephone" label="电话"></el-table-column>
+          <el-table-column prop="bank" label="开户行"></el-table-column>
+          <el-table-column prop="card" label="银行卡号"></el-table-column>
+          <el-table-column fixed="right" label="操作" width="100">
             <template slot-scope="scope">
               <el-button
                 type="text"
                 style="font-size: 14px; font-weight: normal;"
-                @click.native.prevent="deal(scope, 'view')"
+                @click.native.prevent="gotoEdit(scope.row)"
                 size="small"
                 class="my-button"
               >编辑</el-button>
               <el-button
-                v-if="isHasDetele"
                 type="text"
                 style="font-size: 14px; font-weight: normal; color: #f56c6c"
-                @click.native.prevent="deal(scope, 'delete')"
+                @click.native.prevent="gotoDelete(scope.row)"
                 size="small"
                 class="my-button"
               >删除</el-button>
@@ -76,18 +69,10 @@ export default {
   props: {},
   data() {
     return {
+      name: '',
       pageSize: 10,
       pageNo: 1,
       totalCount: null,
-      searchTable: {
-        kslb: '',
-        kcfs: '',
-        kz: '',
-        gbnd: '',
-        tdqs: '',
-        xzqh: '',
-        state: '',
-      },
       todoData: [],
       loading: false,
     };
@@ -106,11 +91,11 @@ export default {
       let param = {
         pageNo: pageNo || this.pageNo,
         pageSize: this.pageSize,
-        keyword: this.ksmc || undefined,
+        name: this.name || undefined,
       };
-      // let res = await manage.getGoodsList(param);
-      // this.totalCount = res.totalCount;
-      // const dataList = res.dataList || [];
+      let res = await manage.dealerList(param);
+      this.totalCount = res.total;
+      this.todoData = res.list || [];
       this.loading = false;
     },
     gotoSave() {
@@ -118,9 +103,33 @@ export default {
         name: 'dealerSave',
       });
     },
-    async deleteSelf(id) {
-      let res = await manage.goodsRemove({id: id});
-      if (res.meta.code === 200) {
+    gotoEdit(item) {
+      this.$router.push({
+        name: 'dealerSave',
+        query: {
+          id: item.id
+        }
+      });
+    },
+    gotoDelete(item) {
+      this.$confirm('是否确定删除?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+      })
+        .then(() => {
+          this.deleteSelf(item);
+        })
+        .catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除',
+          });
+        });
+    },
+    async deleteSelf(item) {
+      let res = await manage.dealerRemove({id: item.id});
+      if (res.code === '20000' && res.data === 1) {
         this.clickTab();
         this.$message({
           type: 'success',
@@ -137,7 +146,7 @@ export default {
 };
 </script>
 <style lang="scss">
-.list-wrapper {
+.dealer-wrapper {
   padding: 15px 20px;
   .el-button--mini,
   .el-button--small {
@@ -148,15 +157,15 @@ export default {
     background-color: #545c64;
     border: none;
   }
-  .el-radio-button__orig-radio:checked + .el-radio-button__inner {
-    background-color: #545c64;
-    border-color: #545c64;
-    color: #fff;
-  }
-  .el-radio-button__inner:hover,
-  .el-button--text {
-    color: #545c64;
-  }
+  // .el-radio-button__orig-radio:checked + .el-radio-button__inner {
+  //   background-color: #545c64;
+  //   border-color: #545c64;
+  //   color: #fff;
+  // }
+  // .el-radio-button__inner:hover,
+  // .el-button--text {
+  //   color: #545c64;
+  // }
   .el-radio-button--small .el-radio-button__inner {
     font-size: 14px;
     font-weight: normal;

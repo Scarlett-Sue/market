@@ -2,7 +2,7 @@
   <div class="flow-wrap">
     <el-card class="my-card">
       <div slot="header" class="clearfix">
-        <span style="color: #2e343a;">供应商管理</span>
+        <span style="color: #2e343a;">供货商管理</span>
       </div>
       <div class="form">
         <base-info ref="baseInfo" :detail="detail"></base-info>
@@ -20,10 +20,8 @@
 </template>
 <script>
 import { mapState, mapGetters } from 'vuex';
-// import approval from '@/api/approval';
-// import mineOwner from '@/api/mine_owner';
+import manage from '@/api/manage';
 import baseInfo from '../../components/supplier/baseInfo';
-
 export default {
   components: {
     baseInfo,
@@ -35,63 +33,44 @@ export default {
   },
   data() {
     return {
+      btnLoading: false,
+      detail: {},
     };
   },
   computed: {
-    ...mapState('User', {
-      userInfo: state => {
-        const { userInfo } = state;
-        if (!userInfo) {
-          return {};
-        }
-        return userInfo;
-      },
-    }),
-    ...mapGetters('User', ['userType']),
   },
   async mounted() {
     const load = this.$loading({ background: 'rgba(255,255,255,0.5)' });
     if (this.id) {
-      let detail = await mineOwner.getFundBaseInfoDetail({ mfId: this.id });
+      let detail = await manage.supplierDetail({ id: this.id });
       this.detail = detail;
     }
     load.close();
   },
   methods: {
     async submit(operate) {
-        await this.validateForm('baseInfo');
-
+      await this.validateForm('baseInfo');
       let infoForm = Object.assign({}, this.$refs.baseInfo.form);
-      if (
-        !this.transFileList(mineFundFileInfos, this.$refs.baseInfo.fj, operate)
-      ) {
-        return false;
-      }
-      infoForm.mineFundFileInfos = mineFundFileInfos;
-
       this.btnLoading = true;
       try {
-        infoForm.mineFlag = 1;
-        let res = await mineOwner.launchFundBaseInfo(infoForm);
-        this.btnLoading = false;
-        if (this.$R.path(['meta', 'success'], res)) {
-          this.$message({
-            message: '提交基金基本信息成功',
-            type: 'success',
-          });
-          this.$router.push({
-            name: 'fundBaseInfo',
-          });
-        } else {
-          infoForm.mineFlag = 0;
-          let res = await mineOwner.launchFundBaseInfo(infoForm);
+        if (this.id) {
+          let res = await manage.supplierUpdate(infoForm);
           this.btnLoading = false;
-          if (this.$R.path(['meta', 'success'], res)) {
-            this.mfId = res.data;
-            this.$message({
-              message: '保存基金基本信息成功',
-              type: 'success',
+          if (res.code === '20000') {
+            this.$message.success('保存成功');
+          } else {
+            this.$message.warning(res.data || '保存失败');
+          }
+        } else {
+          let res = await manage.supplierAdd(infoForm);
+          this.btnLoading = false;
+          if (res.code === '20000') {
+            this.$message.success('添加成功');
+            this.$router.push({
+              name: 'supplier',
             });
+          } else {
+            this.$message.warning(res.data || '添加失败');
           }
         }
       } catch (error) {
