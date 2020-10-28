@@ -49,6 +49,20 @@ export default [
         ],
       },
       {
+        path: 'area',
+        name: 'area',
+        component: () => import('../views/area/index'),
+        props: route => ({ ...route.query }),
+        children: [
+          {
+            path: 'save',
+            name: 'areaSave',
+            component: () => import('../views/area/save'),
+            props: route => ({ ...route.query }),
+          },
+        ],
+      },
+      {
         path: 'supplier',
         name: 'supplier',
         component: () => import('../views/supplier/index'),

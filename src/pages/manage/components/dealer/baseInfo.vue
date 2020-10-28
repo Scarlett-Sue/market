@@ -76,7 +76,6 @@ export default {
         bank: '',
         card: '',
         remark: '',
-        type: '',
       },
       rules: {
         need: {

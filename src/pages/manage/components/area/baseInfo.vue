@@ -1,30 +1,33 @@
 <template>
   <div class="base-info">
     <el-form ref="form" :model="form" label-width="170px" :rules="rules" :label-position="'top'">
-      <div class="form-card">
+      <div class="form-card" v-if="operate === 'edit'">
         <div class="form-title">
           <div class="form-rectangle">
             <div class="form-prefix"></div>
-            <a>基本信息</a>
+            <a>仓库信息</a>
             <div class="form-triangle"></div>
           </div>
         </div>
         <div class="form-content">
           <el-row type="flex" style="flex-wrap:wrap" :gutter="150">
-            <el-col :md="12" :lg="8" :xl="8">
-              <el-form-item label="仓库名称" prop="name" :rules="rules.need">
-                <el-input v-model="form.name" placeholder="请输入"></el-input>
-              </el-form-item>
+            <el-col :md="12" :lg="8" :xl="6">
+              <div class="item">
+                <div class="label">所在仓库：</div>
+                <div class="content">{{ depot.name }}</div>
+              </div>
             </el-col>
-            <el-col :md="12" :lg="8" :xl="8">
-              <el-form-item label="地址" prop="address" :rules="rules.need">
-                <el-input v-model="form.address" placeholder="请输入"></el-input>
-              </el-form-item>
+            <el-col :md="12" :lg="8" :xl="6">
+              <div class="item">
+                <div class="label">仓库地址：</div>
+                <div class="content">{{ depot.address }}</div>
+              </div>
             </el-col>
-            <el-col :md="12" :lg="8" :xl="8">
-              <el-form-item label="类型" prop="type" :rules="rules.need">
-                <el-input v-model="form.type" placeholder="请输入"></el-input>
-              </el-form-item>
+            <el-col :md="12" :lg="8" :xl="6">
+              <div class="item">
+                <div class="label">仓库类型：</div>
+                <div class="content">{{ depot.type }}</div>
+              </div>
             </el-col>
           </el-row>
         </div>
@@ -38,80 +41,51 @@
           </div>
         </div>
         <div class="form-content">
-          <el-table :data="form.areaList" style="width: 100%">
-            <el-table-column prop="name" label="区域名称"></el-table-column>
-            <el-table-column prop="unit" label="物品单位"></el-table-column>
-            <el-table-column prop="size" label="总容量"></el-table-column>
-            <el-table-column prop="margin" label="剩余量"></el-table-column>
-          </el-table>
+          <el-row type="flex" style="flex-wrap:wrap" :gutter="150">
+            <el-col :md="12" :lg="8" :xl="8" v-if="operate === 'add'">
+              <el-form-item label="所在仓库" prop="depotId" :rules="rules.need">
+                <el-select
+                  v-model="form.depotId"
+                  clearable
+                  placeholder="请选择"
+                  style="width: 100%"
+                  filterable
+                  remote
+                  reserve-keyword
+                  :remote-method="remoteMethod"
+                  :loading="loading"
+                >
+                  <el-option
+                    v-for="item in depotList"
+                    :key="item.id"
+                    :label="item.name"
+                    :value="item.id"
+                  ></el-option>
+                </el-select>
+              </el-form-item>
+            </el-col>
+            <el-col :md="12" :lg="8" :xl="8">
+              <el-form-item label="区域名称" prop="name" :rules="rules.need">
+                <el-input v-model="form.name" placeholder="请输入"></el-input>
+              </el-form-item>
+            </el-col>
+            <el-col :md="12" :lg="8" :xl="8">
+              <el-form-item label="单位" prop="unit" :rules="rules.need">
+                <el-input v-model="form.unit" placeholder="请输入"></el-input>
+              </el-form-item>
+            </el-col>
+            <el-col :md="12" :lg="8" :xl="8">
+              <el-form-item label="总容量" prop="size" :rules="rules.num">
+                <el-input v-model="form.size" placeholder="请输入"></el-input>
+              </el-form-item>
+            </el-col>
+            <el-col :md="12" :lg="8" :xl="8">
+              <el-form-item label="剩余量" prop="margin" :rules="rules.num">
+                <el-input v-model="form.margin" disabled></el-input>
+              </el-form-item>
+            </el-col>
+          </el-row>
         </div>
-        <!-- <div class="form-content form-table">
-          <table>
-            <thead>
-              <tr>
-                <th style="width: 10%">序号</th>
-                <th><span class="tips">* </span>区域名称</th>
-                <th><span class="tips">* </span>物品单位</th>
-                <th><span class="tips">* </span>总容量</th>
-                <th><span class="tips">* </span>剩余量</th>
-                <th>操作</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(item, index) in form.areaInfo" :key="index">
-                <td>{{ index + 1 }}</td>
-                <td>
-                  <el-form-item
-                    :prop="'areaInfo.' + index + '.name'"
-                    style="margin-bottom: 0;"
-                    :rules="rules.need"
-                  >
-                    <el-input v-model="item.name"></el-input>
-                  </el-form-item>
-                </td>
-                <td>
-                  <el-form-item
-                    :prop="'areaInfo.' + index + '.unit'"
-                    style="margin-bottom: 0;"
-                    :rules="rules.need"
-                  >
-                    <el-input v-model="item.unit"></el-input>
-                  </el-form-item>
-                </td>
-                <td>
-                  <el-form-item
-                    :prop="'areaInfo.' + index + '.size'"
-                    style="margin-bottom: 0;"
-                    :rules="rules.num"
-                  >
-                    <el-input v-model="item.size"></el-input>
-                  </el-form-item>
-                </td>
-                <td>
-                  <el-form-item
-                    :prop="'areaInfo.' + index + '.size'"
-                    style="margin-bottom: 0;"
-                    :rules="rules.num"
-                  >
-                    <el-input v-model="item.margin" disabled></el-input>
-                  </el-form-item>
-                </td>
-                <td>
-                  <el-button
-                    type="text"
-                    style="color: #F56C6C;"
-                    @click="removeItem(index)"
-                  >
-                    <i class="el-icon-remove"></i> 删除
-                  </el-button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <div class="table-add">
-            <el-button @click="addItem" icon="el-icon-plus">新增</el-button>
-          </div>
-        </div> -->
       </div>
     </el-form>
   </div>
@@ -119,29 +93,49 @@
 
 <script>
 import { mapState } from 'vuex';
-
+import manage from '@/api/manage';
 export default {
   props: {
     detail: {
       type: Object,
     },
+    operate: {
+      type: String,
+    }
   },
   watch: {
     detail: {
       handler: function (val) {
+        this.depot = Object.assign({}, this.detail.depot);
         this.form = Object.assign(this.form, this.detail);
+        delete this.form.depot;
       },
       immediate: true,
+    },
+    'form.size': function(val) {
+      if (this.operate === 'add') {
+        this.form.margin = val;
+      } else {
+        let change = val - this.detail.size;
+        if (val < 0 && this.detail.margin + change < 0) {
+          this.$message.warning('总容量应大于已使用容量');
+        } else {
+          this.form.margin = this.detail.margin + change;
+        }
+      }
     },
   },
   data() {
     return {
+      loading: false,
+      depot: {},
+      depotList: [],
       form: {
         id: '',
         name: '',
-        address: '',
-        type: '',
-        areaList: [],
+        unit: '',
+        size: '',
+        margin: '',
       },
       rules: {
         need: {
@@ -176,24 +170,18 @@ export default {
       },
     };
   },
+  mounted () {
+    this.remoteMethod();
+  },
   methods: {
-    addItem() {
-      if (this.form.areaInfo.length === 8) {
-        this.$message({
-          message: '最多添加十个区域',
-          type: 'warning',
-        });
-      } else {
-        this.form.areaInfo.push({
-          name: '',
-          size: '',
-          unit: '',
-          margin: '',
-        });
-      }
-    },
-    removeItem(index) {
-      this.form.areaInfo = this.$R.remove(index, 1)(this.form.areaInfo);
+    async remoteMethod(name) {
+      this.loading = true;
+      let param = {
+        name: name || undefined,
+      };
+      let res = await manage.depotAllList(param);
+      this.depotList = res || [];
+      this.loading = false;
     },
   },
 };
@@ -245,6 +233,28 @@ export default {
     .form-content {
       padding: 25px 30px;
       box-sizing: border-box;
+      .item {
+        display: flex;
+        margin: 0 0 10px 0;
+        justify-content: flex-start;
+        font-size: 14px;
+        .label {
+          width: 140px;
+          padding: 5px 0;
+          text-align: left;
+          color: rgb(103, 105, 105);
+        }
+        .label-large {
+          width: 160px;
+          padding: 5px 0;
+          text-align: left;
+          color: rgb(103, 105, 105);
+        }
+        .content {
+          width: 50%;
+          padding: 5px 0 5px 8px;
+        }
+      }
       .tips {
         font-size: 12px;
         color: #f56c6c;

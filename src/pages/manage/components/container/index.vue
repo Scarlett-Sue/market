@@ -56,6 +56,13 @@ export default {
               exclude: ['1', '2'],
             },
             {
+              name: '区域管理',
+              path: 'area',
+              icon: '',
+              key: 'area',
+              exclude: ['1', '2'],
+            },
+            {
               name: '商品管理',
               path: 'goods',
               icon: '商品管理',

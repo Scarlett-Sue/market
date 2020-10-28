@@ -2,10 +2,10 @@
   <div class="flow-wrap">
     <el-card class="my-card">
       <div slot="header" class="clearfix">
-        <span style="color: #2e343a;">仓库管理</span>
+        <span style="color: #2e343a;">仓库区域管理</span>
       </div>
       <div class="form">
-        <base-info ref="baseInfo" :detail="detail"></base-info>
+        <base-info ref="baseInfo" :detail="detail" :operate="id?'edit':'add'"></base-info>
       </div>
       <div class="operation">
         <el-button
@@ -21,7 +21,7 @@
 <script>
 import { mapState, mapGetters } from 'vuex';
 import manage from '@/api/manage';
-import baseInfo from '../../components/depot/baseInfo';
+import baseInfo from '../../components/area/baseInfo';
 export default {
   components: {
     baseInfo,
@@ -42,7 +42,7 @@ export default {
   async mounted() {
     const load = this.$loading({ background: 'rgba(255,255,255,0.5)' });
     if (this.id) {
-      let detail = await manage.depotDetail({ id: this.id });
+      let detail = await manage.areaDetail({ id: this.id });
       this.detail = detail;
     }
     load.close();
@@ -55,7 +55,7 @@ export default {
       this.btnLoading = true;
       try {
         if (this.id) {
-          let res = await manage.depotUpdate(infoForm);
+          let res = await manage.areaUpdate(infoForm);
           this.btnLoading = false;
           if (res.code === '20000') {
             this.$message.success('保存成功');
@@ -63,12 +63,12 @@ export default {
             this.$message.warning(res.data || '保存失败');
           }
         } else {
-          let res = await manage.depotAdd(infoForm);
+          let res = await manage.areaAdd(infoForm);
           this.btnLoading = false;
           if (res.code === '20000') {
             this.$message.success('添加成功');
             this.$router.push({
-              name: 'depot',
+              name: 'area',
             });
           } else {
             this.$message.warning(res.data || '添加失败');

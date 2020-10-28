@@ -1,5 +1,5 @@
 <template>
-  <div class="depot-wrapper">
+  <div class="area-wrapper">
     <div class="middle">
       <el-button
         type="primary"
@@ -20,32 +20,13 @@
     <div class="bottom">
       <div class="content" v-loading="loading">
         <el-table :data="todoData" style="width: 100%">
-          <el-table-column prop="name" label="仓库名称"></el-table-column>
-          <el-table-column prop="address" label="地址"></el-table-column>
-          <el-table-column prop="type" label="类型"></el-table-column>
-          <el-table-column prop="status" label="状态">
+          <el-table-column prop="depot.name" label="所在仓库"></el-table-column>
+          <el-table-column prop="name" label="区域名称"></el-table-column>
+          <el-table-column prop="unit" label="单位"></el-table-column>
+          <el-table-column prop="size" label="总容量"></el-table-column>
+          <el-table-column prop="margin" label="剩余量"></el-table-column>
+          <el-table-column fixed="right" label="操作" width="100">
             <template slot-scope="scope">
-              {{ statusList[scope.row.status] }}
-            </template>
-          </el-table-column>
-          <el-table-column fixed="right" label="操作" width="140">
-            <template slot-scope="scope">
-              <el-button
-                v-if="scope.row.status === '0'"
-                type="text"
-                style="font-size: 14px; font-weight: normal;"
-                @click.native.prevent="gotoUp(scope.row)"
-                size="small"
-                class="my-button"
-              >启用</el-button>
-              <el-button
-                v-if="scope.row.status === '1'"
-                type="text"
-                style="font-size: 14px; font-weight: normal;"
-                @click.native.prevent="gotoDown(scope.row)"
-                size="small"
-                class="my-button"
-              >禁用</el-button>
               <el-button
                 type="text"
                 style="font-size: 14px; font-weight: normal;"
@@ -115,25 +96,29 @@ export default {
         pageSize: this.pageSize,
         name: this.name || undefined,
       };
-      let res = await manage.depotList(param);
+      let res = await manage.areaList(param);
       this.totalCount = res.total;
       this.todoData = res.list || [];
       this.loading = false;
     },
     gotoSave() {
       this.$router.push({
-        name: 'depotSave',
+        name: 'areaSave',
       });
     },
     gotoEdit(item) {
       this.$router.push({
-        name: 'depotSave',
+        name: 'areaSave',
         query: {
           id: item.id
         }
       });
     },
     gotoDelete(item) {
+      if (item.margin < item.size) {
+        this.$message.warning('区域使用中，不可删除');
+        return;
+      }
       this.$confirm('是否确定删除?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -150,7 +135,7 @@ export default {
         });
     },
     async deleteSelf(item) {
-      let res = await manage.depotRemove({id: item.id});
+      let res = await manage.areaRemove({id: item.id});
       if (res.code === '20000' && res.data === 1) {
         this.clickTab();
         this.$message({
@@ -165,7 +150,7 @@ export default {
       }
     },
     async gotoUp(item) {
-      let res = await manage.depotUpdate({id: item.id, status: '1'});
+      let res = await manage.goodsUpdate({id: item.id, status: '1'});
       if (res.code === '20000') {
         this.$message.success('启用成功');
         this.clickTab();
@@ -174,7 +159,7 @@ export default {
       }
     },
     async gotoDown(item) {
-      let res = await manage.depotUpdate({id: item.id, status: '0'});
+      let res = await manage.goodsUpdate({id: item.id, status: '0'});
       if (res.code === '20000') {
         this.$message.success('禁用成功');
         this.clickTab();
@@ -186,7 +171,7 @@ export default {
 };
 </script>
 <style lang="scss">
-.depot-wrapper {
+.area-wrapper {
   padding: 15px 20px;
   .el-button--mini,
   .el-button--small {

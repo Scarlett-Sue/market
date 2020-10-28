@@ -173,6 +173,14 @@ export default {
     });
     return res.data;
   },
+  async depotAllList(params) {
+    let res = await $http.fetch({
+      method: 'get',
+      url: url.depotAllList,
+      params: params,
+    });
+    return res.data;
+  },
   async areaDetail(params) {
     let res = await $http.fetch({
       method: 'get',
