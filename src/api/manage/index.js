@@ -381,4 +381,20 @@ export default {
     });
     return res.data;
   },
+  async contentUpdate(params) {
+    let res = await $http.fetch({
+      method: 'post',
+      url: url.contentUpdate,
+      data: params,
+    });
+    return res;
+  },
+  async contentList(params) {
+    let res = await $http.fetch({
+      method: 'get',
+      url: url.contentList,
+      params: params,
+    });
+    return res.data;
+  },
 };

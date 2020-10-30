@@ -66,4 +66,7 @@ export const url = {
   shipmentRemove: host + '/shipment/delete.do',
   shipmentList: host + '/shipment/list.do',
   shipmentAllList: host + '/shipment/all.do',
+
+  contentUpdate: host + '/content/update.do',
+  contentList: host + '/content/list.do',
 };

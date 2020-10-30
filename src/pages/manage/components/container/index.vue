@@ -69,6 +69,13 @@ export default {
               key: 'goods',
               exclude: ['1', '2'],
             },
+            {
+              name: '出库管理',
+              path: 'content',
+              icon: '',
+              key: 'content',
+              exclude: ['1', '2'],
+            },
           ],
         },
         {

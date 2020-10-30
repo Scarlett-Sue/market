@@ -27,13 +27,13 @@
           <el-table-column prop="margin" label="剩余量"></el-table-column>
           <el-table-column fixed="right" label="操作" width="100">
             <template slot-scope="scope">
-              <el-button
+              <!-- <el-button
                 type="text"
                 style="font-size: 14px; font-weight: normal;"
                 @click.native.prevent="gotoEdit(scope.row)"
                 size="small"
                 class="my-button"
-              >编辑</el-button>
+              >编辑</el-button> -->
               <el-button
                 type="text"
                 style="font-size: 14px; font-weight: normal; color: #f56c6c"

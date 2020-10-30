@@ -96,12 +96,14 @@ export default [
         component: () => import('../views/goods/index'),
         props: route => ({ ...route.query }),
         children: [
-          {
-            path: 'save',
-            name: 'goodsSave',
-            component: () => import('../views/goods/save'),
-            props: route => ({ ...route.query }),
-          },
+        ],
+      },
+      {
+        path: 'content',
+        name: 'content',
+        component: () => import('../views/content/index'),
+        props: route => ({ ...route.query }),
+        children: [
         ],
       },
       {
@@ -134,6 +136,12 @@ export default [
             path: 'save',
             name: 'shipmentSave',
             component: () => import('../views/shipment/save'),
+            props: route => ({ ...route.query }),
+          },
+          {
+            path: 'detail',
+            name: 'shipmentDetail',
+            component: () => import('../views/shipment/detail'),
             props: route => ({ ...route.query }),
           },
         ],

@@ -42,7 +42,7 @@
           </el-col>
           <el-col :md="12" :lg="8" :xl="8">
             <div class="item">
-              <div class="label">采购人员：</div>
+              <div class="label">出库人员：</div>
               <div class="content">{{ form.userName }}</div>
             </div>
           </el-col>
@@ -72,15 +72,17 @@
         </div>
       </div>
       <div class="form-content form-table">
-        <el-table :data="form.cargoList" style="width: 100%">
-          <el-table-column prop="supplierName" label="供货商"></el-table-column>
-          <el-table-column prop="name" label="商品名称"></el-table-column>
+        <el-table :data="form.contentList" style="width: 100%">
+          <el-table-column prop="dealerName" label="经销商"></el-table-column>
+          <el-table-column prop="cargoName" label="商品名称"></el-table-column>
           <el-table-column prop="type" label="类型"></el-table-column>
           <el-table-column prop="brand" label="品牌"></el-table-column>
           <el-table-column prop="model" label="型号"></el-table-column>
           <el-table-column prop="unit" label="计量单位"></el-table-column>
           <el-table-column prop="num" label="数量"></el-table-column>
           <el-table-column prop="price" label="单价(元)"></el-table-column>
+          <el-table-column prop="depotName" label="所在仓库"></el-table-column>
+          <el-table-column prop="areaName" label="所在区域"></el-table-column>
         </el-table>
       </div>
     </div>

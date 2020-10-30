@@ -1,5 +1,5 @@
 <template>
-  <div class="cargo-wrapper">
+  <div class="content-wrapper">
     <div class="middle">
       <!-- <el-button
         type="primary"
@@ -21,14 +21,13 @@
     <div class="bottom">
       <div class="content" v-loading="loading">
         <el-table :data="todoData" style="width: 100%">
-          <el-table-column prop="supplierName" label="供货商"></el-table-column>
-          <el-table-column prop="name" label="商品名称"></el-table-column>
+          <el-table-column prop="dealerName" label="经销商"></el-table-column>
+          <el-table-column prop="cargoName" label="商品名称"></el-table-column>
           <el-table-column prop="type" label="类型"></el-table-column>
           <el-table-column prop="brand" label="品牌"></el-table-column>
           <el-table-column prop="model" label="型号"></el-table-column>
           <el-table-column prop="unit" label="计量单位"></el-table-column>
           <el-table-column prop="num" label="数量"></el-table-column>
-          <el-table-column prop="margin" label="余量"></el-table-column>
           <el-table-column prop="price" label="单价(元)"></el-table-column>
           <el-table-column prop="depotName" label="仓库"></el-table-column>
           <el-table-column prop="areaName" label="区域"></el-table-column>
@@ -46,7 +45,7 @@
                 @click.native.prevent="gotoSend(scope.row)"
                 size="small"
                 class="my-button"
-                >分配</el-button
+                >出货</el-button
               >
               <!-- <el-button
                 type="text"
@@ -71,76 +70,6 @@
         </div>
       </div>
     </div>
-    <el-dialog
-      :visible.sync="dialogVisible"
-      class="pic-dialog"
-      :before-close="reset"
-      title="商品分配至仓库"
-    >
-      <el-form
-        ref="baseInfo"
-        :model="form"
-        label-width="170px"
-        :rules="rules"
-        :label-position="'top'"
-      >
-        <el-form-item label="所在仓库" prop="depotId" :rules="rules.need">
-          <el-select
-            v-model="form.depotId"
-            clearable
-            placeholder="请选择"
-            style="width: 100%"
-            filterable
-            remote
-            @change="getAreas"
-            :remote-method="getDepotList"
-            :loading="depotLoading"
-          >
-            <el-option
-              v-for="item in depotList"
-              :key="item.id"
-              :label="item.name"
-              :value="item.id"
-            >
-              <span style="float: left">{{ item.name }}</span>
-              <span style="float: right; color: #8492a6; font-size: 13px">{{
-                item.type
-              }}</span>
-            </el-option>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="仓库区域" prop="areaId" :rules="rules.need">
-          <el-select
-            v-model="form.areaId"
-            clearable
-            placeholder="请选择"
-            style="width: 100%"
-            filterable
-            remote
-            :remote-method="getAreaList"
-            :loading="areaLoading"
-          >
-            <el-option
-              v-for="item in areaList"
-              :key="item.id"
-              :label="item.name"
-              :value="item.id"
-            >
-              <span style="float: left">{{ item.name }}</span>
-              <span style="float: right; color: #8492a6; font-size: 13px">{{
-                '余量：' + item.margin + item.unit
-              }}</span>
-            </el-option>
-          </el-select>
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogVisible = false" size="mini">取 消</el-button>
-        <el-button type="primary" size="mini" @click="gotoSaveSend"
-          >确 定</el-button
-        >
-      </div>
-    </el-dialog>
   </div>
 </template>
 <script>
@@ -158,26 +87,8 @@ export default {
       todoData: [],
       loading: false,
       statusList: {
-        1: '已分配',
-        0: '未分配',
-      },
-      dialogVisible: false,
-      depotLoading: false,
-      areaLoading: false,
-      depotList: [],
-      areaList: [],
-      form: {
-        id: '',
-        num: '',
-        depotId: '',
-        areaId: '',
-      },
-      rules: {
-        need: {
-          required: true,
-          message: '不能为空',
-          trigger: 'blur',
-        },
+        1: '已出货',
+        0: '未出货',
       },
     };
   },
@@ -197,21 +108,31 @@ export default {
         pageSize: this.pageSize,
         name: this.name || undefined,
       };
-      let res = await manage.cargoList(param);
+      let res = await manage.contentList(param);
       this.totalCount = res.total;
       this.todoData = res.list || [];
       this.loading = false;
     },
     gotoSave() {
       this.$router.push({
-        name: 'cargoSave',
+        name: 'contentSave',
       });
     },
     gotoSend(item) {
-      this.form.id = item.id;
-      this.form.num = item.num;
-      this.dialogVisible = true;
-      this.getDepotList();
+      this.$confirm('是否确定出货?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+      })
+        .then(() => {
+          this.gotoSaveSend(item);
+        })
+        .catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消出货',
+          });
+        });
     },
     gotoDelete(item) {
       this.$confirm('是否确定删除?', '提示', {
@@ -230,7 +151,7 @@ export default {
         });
     },
     async deleteSelf(item) {
-      let res = await manage.cargoRemove({ id: item.id });
+      let res = await manage.contentRemove({ id: item.id });
       if (res.code === '20000' && res.data === 1) {
         this.clickTab();
         this.$message({
@@ -244,76 +165,21 @@ export default {
         });
       }
     },
-    reset(done) {
-      this.form = {
-        id: '',
-        num: '',
-        depotId: '',
-        areaId: '',
-      };
-      done();
-    },
-    async getDepotList(query) {
-      this.depotLoading = true;
-      let param = {
-        pageNo: 1,
-        pageSize: 20,
-        name: query || undefined,
-      };
-      let res = await manage.depotList(param);
-      this.depotList = res.list;
-      this.depotLoading = false;
-    },
-    getAreas() {
-      this.getAreaList();
-    },
-    async getAreaList(query) {
-      this.areaLoading = true;
-      let param = {
-        pageNo: 1,
-        pageSize: 20,
-        depotId: this.form.depotId,
-        name: query || undefined,
-      };
-      let res = await manage.areaList(param);
-      this.areaList = res.list;
-      this.areaLoading = false;
-    },
-    async gotoSaveSend() {
-      await this.validateForm('baseInfo');
-      let res = await manage.cargoUpdate(this.form);
+    async gotoSaveSend(item) {
+      item.status = '1';
+      let res = await manage.contentUpdate(item);
       if (res.code === '20000' && res.data === 1) {
-        this.dialogVisible = false;
         this.clickTab();
         this.$message({
           type: 'success',
-          message: '仓库分配成功!',
+          message: '出货成功!',
         });
       } else {
         this.$message({
           type: 'error',
-          message: '仓库分配失败!',
+          message: '出货失败!',
         });
       }
-    },
-    validateForm(form) {
-      return new Promise((resolve, reject) => {
-        if (this.$refs[form]) {
-          this.$refs[form].validate(valid => {
-            if (valid) {
-              resolve(true);
-            } else {
-              reject(false);
-              this.$message({
-                message: '请填写必填字段',
-                type: 'warning',
-              });
-            }
-          });
-        } else {
-          resolve(true);
-        }
-      });
     },
   },
   filters: {
@@ -337,7 +203,7 @@ export default {
 };
 </script>
 <style lang="scss">
-.cargo-wrapper {
+.content-wrapper {
   padding: 15px 20px;
   .el-button--mini,
   .el-button--small {
