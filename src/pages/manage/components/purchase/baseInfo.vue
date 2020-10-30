@@ -18,6 +18,11 @@
         <div class="form-content">
           <el-row type="flex" style="flex-wrap: wrap" :gutter="150">
             <el-col :md="12" :lg="8" :xl="8">
+              <el-form-item label="订单编码" prop="code" :rules="rules.need">
+                <el-input v-model="form.code" placeholder="请输入"></el-input>
+              </el-form-item>
+            </el-col>
+            <el-col :md="12" :lg="8" :xl="8">
               <el-form-item label="订单名称" prop="name" :rules="rules.need">
                 <el-input v-model="form.name" placeholder="请输入"></el-input>
               </el-form-item>
@@ -26,33 +31,32 @@
               <el-form-item label="订单时间" prop="time" :rules="rules.need">
                 <el-date-picker
                   v-model="form.time"
-                  value-format="yyyy-MM-dd HH:mm:ss"
                   format="yyyy-MM-dd"
                   placeholder="请选择"
                   style="width: 100%"
                 ></el-date-picker>
               </el-form-item>
             </el-col>
-            <el-col :md="12" :lg="8" :xl="8">
+            <!-- <el-col :md="12" :lg="8" :xl="8">
               <el-form-item label="订单数量" prop="num" :rules="rules.need">
                 <el-input v-model="form.num"></el-input>
               </el-form-item>
-            </el-col>
+            </el-col> -->
             <el-col :md="12" :lg="8" :xl="8">
-              <el-form-item label="订单总价" prop="price" :rules="rules.need">
-                <el-input v-model="form.price"></el-input>
+              <el-form-item label="订单总额" prop="totalPrice" :rules="rules.need">
+                <el-input v-model="form.totalPrice"></el-input>
               </el-form-item>
             </el-col>
             <el-col :md="12" :lg="8" :xl="8">
-              <el-form-item label="采购员" prop="userName" :rules="rules.need">
+              <el-form-item label="采购人员" prop="userName" :rules="rules.need">
                 <el-input v-model="form.userName" disabled></el-input>
               </el-form-item>
             </el-col>
             <el-col :md="12" :lg="8" :xl="8">
               <el-form-item
-                label="采购员电话"
+                label="联系电话"
                 prop="userTelephone"
-                :rules="rules.intNum"
+                :rules="rules.need"
               >
                 <el-input v-model="form.userTelephone" disabled></el-input>
               </el-form-item>
@@ -84,10 +88,14 @@
           <table>
             <thead>
               <tr>
+                <th style="width: 200px">供货商</th>
                 <th style="width: 200px">商品名称</th>
-                <th style="width: 200px">单价</th>
+                <th style="width: 200px">类型</th>
+                <th style="width: 200px">品牌</th>
+                <th style="width: 200px">型号</th>
+                <th style="width: 200px">计量单位</th>
                 <th style="width: 200px">数量</th>
-                <th style="width: 200px">总价</th>
+                <th style="width: 200px">单价</th>
                 <th style="width: 200px">操作</th>
               </tr>
             </thead>
@@ -95,18 +103,22 @@
               <tr v-for="(item, index) in form.list" :key="index">
                 <td>
                   <el-form-item
-                    :prop="'list.' + index + '.planTotal'"
-                    :rules="rules.num"
+                    :prop="'list.' + index + '.supplierId'"
+                    :rules="rules.need"
                   >
                     <el-select
-                      v-model="goodsId"
+                      v-model="item.supplierId"
                       clearable
                       placeholder="请选择"
-                      @change="handleGoodsChange"
+                      @change="handleSupplierChange(item.supplierId, index)"
                       style="width: 100%"
+                      filterable
+                      remote
+                      :remote-method="remoteMethod"
+                      :loading="loading"
                     >
                       <el-option
-                        v-for="item in goodsList"
+                        v-for="item in supplierList"
                         :key="item.id"
                         :label="item.name"
                         :value="item.id"
@@ -116,26 +128,58 @@
                 </td>
                 <td>
                   <el-form-item
-                    :prop="'list.' + index + '.planTotal'"
-                    :rules="rules.num"
+                    :prop="'list.' + index + '.name'"
+                    :rules="rules.need"
                   >
-                    <el-input v-model="item.planTotal" placeholder="请输入"></el-input>
+                    <el-input v-model="item.name" placeholder="请输入"></el-input>
                   </el-form-item>
                 </td>
                 <td>
                   <el-form-item
-                    :prop="'list.' + index + '.planTotal'"
-                    :rules="rules.num"
+                    :prop="'list.' + index + '.type'"
+                    :rules="rules.need"
                   >
-                    <el-input v-model="item.planTotal" placeholder="请输入"></el-input>
+                    <el-input v-model="item.type" placeholder="请输入"></el-input>
                   </el-form-item>
                 </td>
                 <td>
                   <el-form-item
-                    :prop="'list.' + index + '.total'"
+                    :prop="'list.' + index + '.brand'"
+                    :rules="rules.need"
+                  >
+                    <el-input v-model="item.brand" placeholder="请输入"></el-input>
+                  </el-form-item>
+                </td>
+                <td>
+                  <el-form-item
+                    :prop="'list.' + index + '.model'"
+                    :rules="rules.need"
+                  >
+                    <el-input v-model="item.model" placeholder="请输入"></el-input>
+                  </el-form-item>
+                </td>
+                <td>
+                  <el-form-item
+                    :prop="'list.' + index + '.unit'"
+                    :rules="rules.need"
+                  >
+                    <el-input v-model="item.unit" placeholder="请输入"></el-input>
+                  </el-form-item>
+                </td>
+                <td>
+                  <el-form-item
+                    :prop="'list.' + index + '.num'"
                     :rules="rules.num"
                   >
-                    <el-input v-model="item.total" placeholder="请输入"></el-input>
+                    <el-input v-model="item.num" placeholder="请输入"></el-input>
+                  </el-form-item>
+                </td>
+                <td>
+                  <el-form-item
+                    :prop="'list.' + index + '.price'"
+                    :rules="rules.num"
+                  >
+                    <el-input v-model="item.price" placeholder="请输入"></el-input>
                   </el-form-item>
                 </td>
                 <td>
@@ -162,18 +206,13 @@
 <script>
 import { mapState } from 'vuex';
 import { url } from '@/api/config';
+import manage from '@/api/manage';
 
 export default {
   props: {
     detail: {
       type: Object,
     },
-    goodsList: {
-      type: Array,
-    },
-    dealerList: {
-      type: Array,
-    }
   },
   watch: {
     detail: {
@@ -183,7 +222,6 @@ export default {
       immediate: true,
     },
   },
-  components: {},
   computed: {
     ...mapState('User', {
       userInfo: state => state.userInfo,
@@ -196,17 +234,31 @@ export default {
   },
   data() {
     return {
+      loading: false,
+      supplierList: [],
       showDialog: false,
       form: {
+        name: '',
+        code: '',
+        userId: '',
+        userName: '',
+        userTelephone: '',
+        totalPrice: '',
+        num: '',
+        time: '',
+        remark: '',
         list: [
           {
-            dealerId: '',
-            dealerName: '',
-            goodsId: '',
-            goodsName: '',
+            supplierId: '',
+            supplierName: '',
+            name: '',
+            type: '',
+            brand: '',
+            model: '',
+            unit: '',
             num: '',
             price: '',
-            total: '',
+            remark: '',
           }
         ],
       },
@@ -243,16 +295,25 @@ export default {
       },
     };
   },
+  mounted () {
+    this.remoteMethod();
+    this.form.userId = this.userInfo.id;
+    this.form.userName = this.userInfo.name;
+    this.form.userTelephone = this.userInfo.telephone;
+  },
   methods: {
     addListItem() {
       this.form.list.push({
-        dealerId: '',
-        dealerName: '',
-        goodsId: '',
-        goodsName: '',
+        supplierId: '',
+        supplierName: '',
+        name: '',
+        type: '',
+        brand: '',
+        model: '',
+        unit: '',
         num: '',
         price: '',
-        total: '',
+        remark: '',
       });
     },
     removeListItem(index) {
@@ -265,22 +326,25 @@ export default {
         this.$message.warning('至少填写一项');
       }
     },
-    handleGoodsChange(value) {
-      for (let item of this.goodsList) {
+    handleSupplierChange(value, index) {
+      for (let item of this.supplierList) {
         if (item.id === value) {
-          this.form.goodsName = item.name;
+          this.form.list[index].supplierName = item.name;
           break;
         }
       }
     },
-    handleDealerChange(value) {
-      for (let item of this.dealerList) {
-        if (item.id === value) {
-          this.form.dealerName = item.name;
-          break;
-        }
+    async remoteMethod(query) {
+      this.loading = true;
+      let param = {
+        pageNo: 1,
+        pageSize: 20,
+        name: query || undefined,
       }
-    },
+      let res = await manage.supplierList(param);
+      this.supplierList = res.list;
+      this.loading = false;
+    }
   },
 };
 </script>

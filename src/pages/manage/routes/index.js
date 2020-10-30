@@ -116,6 +116,12 @@ export default [
             component: () => import('../views/purchase/save'),
             props: route => ({ ...route.query }),
           },
+          {
+            path: 'detail',
+            name: 'purchaseDetail',
+            component: () => import('../views/purchase/detail'),
+            props: route => ({ ...route.query }),
+          },
         ],
       },
       {
